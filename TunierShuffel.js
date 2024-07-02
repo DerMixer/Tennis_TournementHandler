@@ -1,7 +1,7 @@
-var Player = ["player1", "player2", "player3", "player4", "player5", "player6", "player7", "player8", "player9", "player10", "player11", "player12", "player13", "player14", "player15", "player16", "player17", "player18", "player19", "player20", "player21"];
+var Player = ["player1", "player2", "player3", "player4", "player5", "player6", "player7", "player8", "player9", "player10", "player11", "player12", "player13", "player14", "player15", "player16", "player17", "player18", "player19", "player20"];
 var PlayerCopy = [];
 var UsedPairs = [];
-var TournamentPairs = {
+var FullPairs = {
     'Runde:1': [],
     'Runde:2': [],
     'Runde:3': [],
@@ -11,9 +11,47 @@ var TournamentPairs = {
     'Runde:7': [],
     'Runde:8': [],
 };
+var TournamentPairs = {
+    'Runde:1': [],
+    'Runde:2': [],
+    'Runde:3': [],
+    'Runde:4': [],
+    'Runde:5': [],
+    'Runde:6': [],
+    'Runde:7': [],
+    'Runde:8': [],
+}
 
 const prompt = require("prompt-sync")({ sigint: true });
 var shuffle = require('shuffle-array')
+
+function GetGameResult() {
+    for (let game = 1; game < TournamentPairs[`Runde:${rounds}`].length ; game++) {
+        var GameResult = prompt(`Gibt an welches Team gewonnen hat (Für das erste Team "1" eingeben oder für das zweite Team "2" eigeben): ${TournamentPairs[`Runde:${rounds}`][game]}  `);
+        if(GameResult === 1) {
+            var WinnerTeam = FullPairs[`Runde:${rounds}`][0]
+        } else {
+
+        }
+    }
+}
+
+function MakeFullRounds() {
+    for (let rounds = 1; rounds < 9; rounds++) {
+        while (FullPairs[`Runde:${rounds}`].length > 0) {
+            var First = FullPairs[`Runde:${rounds}`][0]
+            FullPairs[`Runde:${rounds}`].shift()
+            var Second = FullPairs[`Runde:${rounds}`][0]
+            FullPairs[`Runde:${rounds}`].shift()
+            if (Second === undefined) {
+                Second = 'kein übriges Team';
+            }
+            TournamentPairs[`Runde:${rounds}`].push(`${First} gegen ${Second}`)
+        }
+    }
+    
+    console.log(TournamentPairs, 'TorunamentPairs')
+}
 
 function RefillCopy() {
     for (let i = 0; i < Player.length; i++) {
@@ -44,7 +82,7 @@ function MakePairs(PlayerCopy,rounds) {
             else {
                 UsedPairs.push(`${First}${Second}`,`${Second}${First}`)
             }
-            TournamentPairs[`Runde:${rounds}`].push(`${First} + ${Second}`);
+            FullPairs[`Runde:${rounds}`].push(`${First} + ${Second}`);
             shuffle(PlayerCopy)
         }
     }
@@ -56,7 +94,8 @@ function HandleRounds() {
         shuffle(PlayerCopy)
         MakePairs(PlayerCopy,rounds)
     }
-    console.log(TournamentPairs)
+    console.log(FullPairs)
+    MakeFullRounds()
 }
 
 function GetInput() {
