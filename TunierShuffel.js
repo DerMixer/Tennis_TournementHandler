@@ -11,6 +11,7 @@ var FullPairs = {
     'Runde:7': [],
     'Runde:8': [],
 };
+var FullPairsCopy = [];
 var TournamentPairs = {
     'Runde:1': [],
     'Runde:2': [],
@@ -21,22 +22,35 @@ var TournamentPairs = {
     'Runde:7': [],
     'Runde:8': [],
 }
+var Tierlist = {};
 
 const prompt = require("prompt-sync")({ sigint: true });
 var shuffle = require('shuffle-array')
 
-function GetGameResult() {
-    for (let game = 1; game < TournamentPairs[`Runde:${rounds}`].length ; game++) {
-        var GameResult = prompt(`Gibt an welches Team gewonnen hat (Für das erste Team "1" eingeben oder für das zweite Team "2" eigeben): ${TournamentPairs[`Runde:${rounds}`][game]}  `);
-        if(GameResult === 1) {
-            var WinnerTeam = FullPairs[`Runde:${rounds}`][0]
-        } else {
+function MenageGameResults() {1
+    for (var rounds = 1 ; rounds < 9 ; rounds++) {
+        while (TournamentPairs[`Runde:${rounds}`].length) {
+            var GameResult = prompt(`Gibt an welches Team gewonnen hat (Für das erste Team "1" eingeben oder für das zweite Team "2" eigeben): ${TournamentPairs[`Runde:${rounds}`][0]}  `);
+            if(GameResult == 1) {
+                console.log(FullPairsCopy[`Runde:${rounds}`],'hier')
+                var WinnerTeam = FullPairsCopy[`Runde:${rounds}`].slice(' + ')
+                console.log('winnerTeam: ', WinnerTeam)
+                var First = WinnerTeam[0];
+                WinnerTeam.shift();
+                var Second = WinnerTeam[0];
+                WinnerTeam.shift();
+                FullPairsCopy[`Runde:${rounds}`].shift()
+                console.log(`${First} ${Second}`);
+                TournamentPairs[`Runde:${rounds}`].shift(TournamentPairs[`Runde:${rounds}`][0]);
+            } else {
 
+            }
         }
     }
 }
 
 function MakeFullRounds() {
+    FullPairsCopy = FullPairs
     for (let rounds = 1; rounds < 9; rounds++) {
         while (FullPairs[`Runde:${rounds}`].length > 0) {
             var First = FullPairs[`Runde:${rounds}`][0]
@@ -49,7 +63,6 @@ function MakeFullRounds() {
             TournamentPairs[`Runde:${rounds}`].push(`${First} gegen ${Second}`)
         }
     }
-    
     console.log(TournamentPairs, 'TorunamentPairs')
 }
 
@@ -94,8 +107,8 @@ function HandleRounds() {
         shuffle(PlayerCopy)
         MakePairs(PlayerCopy,rounds)
     }
-    console.log(FullPairs)
     MakeFullRounds()
+    MenageGameResults()
 }
 
 function GetInput() {
