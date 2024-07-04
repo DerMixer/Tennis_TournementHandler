@@ -11,7 +11,16 @@ var FullPairs = {
     'Runde:7': [],
     'Runde:8': [],
 };
-var FullPairsCopy = [];
+var FullPairsCopy = {
+    'Runde:1': [],
+    'Runde:2': [],
+    'Runde:3': [],
+    'Runde:4': [],
+    'Runde:5': [],
+    'Runde:6': [],
+    'Runde:7': [],
+    'Runde:8': [],
+};
 var TournamentPairs = {
     'Runde:1': [],
     'Runde:2': [],
@@ -27,19 +36,15 @@ var Tierlist = {};
 const prompt = require("prompt-sync")({ sigint: true });
 var shuffle = require('shuffle-array')
 
-function RefillCopy2() {
-    for (let i = 0; i < FullPairs.length; i++) {
-        FullPairsCopy.push(FullPairs[i])
-    }
-}
-
-function MenageGameResults() {
+function MenageGameResults() {//7
+    console.log(FullPairsCopy,'test')
     for (var rounds = 1 ; rounds < 9 ; rounds++) {
         while (TournamentPairs[`Runde:${rounds}`].length) {
             console.log(`Gibt an welches Team gewonnen hat (Für das erste Team "1" eingeben oder für das zweite Team "2" eigeben): ${TournamentPairs[`Runde:${rounds}`][0]}  `)
             var GameResult = prompt();
             if(GameResult == 1) {
-                var WinnerTeam = FullPairsCopy[`Runde:${rounds}`].slice(' + ')
+                var WinnerTeam = FullPairsCopy[`Runde:${rounds}`][0]//.slice(' + ')
+                console.log(WinnerTeam,'WinnerTeam')
                 var First = WinnerTeam[0];
                 WinnerTeam.shift();
                 var Second = WinnerTeam[0];
@@ -54,7 +59,10 @@ function MenageGameResults() {
     }
 }
 
-function MakeFullRounds() {
+function MakeFullRounds() { //5
+    console.log(FullPairs,'Full')
+    FullPairsCopy = FullPairs
+    console.log(FullPairs,'FullCopy')
     for (let rounds = 1; rounds < 9; rounds++) {
         while (FullPairs[`Runde:${rounds}`].length > 0) {
             var First = FullPairs[`Runde:${rounds}`][0]
@@ -67,18 +75,18 @@ function MakeFullRounds() {
             TournamentPairs[`Runde:${rounds}`].push(`${First} gegen ${Second}`)
         }
     }
-    console.log(TournamentPairs, 'TorunamentPairs')
+    //console.log(TournamentPairs, 'TorunamentPairs')
     MenageGameResults()
 }
 
-function RefillCopy() {
+function RefillCopy() {//3
     for (let i = 0; i < Player.length; i++) {
         PlayerCopy.push(Player[i])
         shuffle(PlayerCopy)
     }
 }
 
-function MakePairs(PlayerCopy,rounds) {
+function MakePairs(PlayerCopy,rounds) { //4
     while (PlayerCopy.length > 0) {
         var First = PlayerCopy[0];
         PlayerCopy.shift(First);
@@ -106,16 +114,16 @@ function MakePairs(PlayerCopy,rounds) {
     }
 }
 
-function HandleRounds() {
+function HandleRounds() { //2
     for (let rounds = 1; rounds < 9; rounds++) {
-        RefillCopy()
+        RefillCopy()//3
         shuffle(PlayerCopy)
-        MakePairs(PlayerCopy,rounds)
+        MakePairs(PlayerCopy,rounds)//4
     }
-    MakeFullRounds()
+    MakeFullRounds()//5
 }
 
-function GetInput() {
+function GetInput() { //1
     var Input = prompt('Gibt einen Teilnehmer ein (Wenn sie fertig sind geben sie "fertig" ein): ');
     if (Input == 'fertig') {
         HandleRounds();
