@@ -11,7 +11,7 @@ var FullPairs = {
     'Runde:7': [],
     'Runde:8': [],
 };
-var FullPairsCopy = {
+var FullPairsCopy = {    
     'Runde:1': [],
     'Runde:2': [],
     'Runde:3': [],
@@ -37,21 +37,22 @@ const prompt = require("prompt-sync")({ sigint: true });
 var shuffle = require('shuffle-array')
 
 function MenageGameResults() {//7
-    console.log(FullPairsCopy,'test')
     for (var rounds = 1 ; rounds < 9 ; rounds++) {
         while (TournamentPairs[`Runde:${rounds}`].length) {
             console.log(`Gibt an welches Team gewonnen hat (Für das erste Team "1" eingeben oder für das zweite Team "2" eigeben): ${TournamentPairs[`Runde:${rounds}`][0]}  `)
             var GameResult = prompt();
             if(GameResult == 1) {
-                var WinnerTeam = FullPairsCopy[`Runde:${rounds}`][0]//.slice(' + ')
+                var WinnerTeam = FullPairsCopy[`Runde:${rounds}`][0].split(' + ')
                 console.log(WinnerTeam,'WinnerTeam')
                 var First = WinnerTeam[0];
                 WinnerTeam.shift();
                 var Second = WinnerTeam[0];
                 WinnerTeam.shift();
                 FullPairsCopy[`Runde:${rounds}`].shift()
-                console.log(`${First} ${Second}`);
+                Tierlist[First] = +1
+                Tierlist[Second] = +1
                 TournamentPairs[`Runde:${rounds}`].shift(TournamentPairs[`Runde:${rounds}`][0]);
+                console.log(Tierlist)
             } else {
 
             }
@@ -60,9 +61,6 @@ function MenageGameResults() {//7
 }
 
 function MakeFullRounds() { //5
-    console.log(FullPairs,'Full')
-    FullPairsCopy = FullPairs
-    console.log(FullPairs,'FullCopy')
     for (let rounds = 1; rounds < 9; rounds++) {
         while (FullPairs[`Runde:${rounds}`].length > 0) {
             var First = FullPairs[`Runde:${rounds}`][0]
@@ -75,8 +73,7 @@ function MakeFullRounds() { //5
             TournamentPairs[`Runde:${rounds}`].push(`${First} gegen ${Second}`)
         }
     }
-    //console.log(TournamentPairs, 'TorunamentPairs')
-    MenageGameResults()
+    console.log(TournamentPairs, 'TorunamentPairs')
 }
 
 function RefillCopy() {//3
@@ -109,6 +106,7 @@ function MakePairs(PlayerCopy,rounds) { //4
                 UsedPairs.push(`${First}${Second}`,`${Second}${First}`)
             }
             FullPairs[`Runde:${rounds}`].push(`${First} + ${Second}`);
+            FullPairsCopy[`Runde:${rounds}`].push(`${First} + ${Second}`)
             shuffle(PlayerCopy)
         }
     }
@@ -121,6 +119,7 @@ function HandleRounds() { //2
         MakePairs(PlayerCopy,rounds)//4
     }
     MakeFullRounds()//5
+    MenageGameResults()
 }
 
 function GetInput() { //1
@@ -131,7 +130,9 @@ function GetInput() { //1
     }
     else {
         Player.push(Input)
-        PlayerCopy.push(Input)
+        PlayerCopy.push(Input)^
+        Tierlist[Input]
+        console.log(Tierlist)
         GetInput()
     }
 }
