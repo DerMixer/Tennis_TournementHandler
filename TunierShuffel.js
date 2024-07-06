@@ -32,32 +32,64 @@ var TournamentPairs = {
     'Runde:8': [],
 }
 var Tierlist = {};
+var PlacementHolder = [];
+
+for (var i = 0; i < Player.length; i++) {
+    Tierlist[Player[i]] = 0
+}
 
 const prompt = require("prompt-sync")({ sigint: true });
 var shuffle = require('shuffle-array')
 
+function ManegeTierlist(rounds) {
+    if ( FullPairsCopy[`Runde:${rounds}`][0] == 'kein übriges Team') {
+        return
+    } else {
+        var WinnerTeam = FullPairsCopy[`Runde:${rounds}`][0].split(' + ')
+        var First = WinnerTeam[0];
+        WinnerTeam.shift();
+        var Second = WinnerTeam[0];
+        WinnerTeam.shift();
+        FullPairsCopy[`Runde:${rounds}`].shift()
+        Tierlist[First] +=1
+        Tierlist[Second] +=1
+        TournamentPairs[`Runde:${rounds}`].shift(TournamentPairs[`Runde:${rounds}`][0]);
+    }
+} 
+
 function MenageGameResults() {//7
+    console.log('Gibt an welches Team gewonnen hat (Für das erste Team "1" eingeben oder für das zweite Team "2" eigeben):')
     for (var rounds = 1 ; rounds < 9 ; rounds++) {
         while (TournamentPairs[`Runde:${rounds}`].length) {
-            console.log(`Gibt an welches Team gewonnen hat (Für das erste Team "1" eingeben oder für das zweite Team "2" eigeben): ${TournamentPairs[`Runde:${rounds}`][0]}  `)
+            console.log(`${TournamentPairs[`Runde:${rounds}`][0]}:`)
             var GameResult = prompt();
             if(GameResult == 1) {
-                var WinnerTeam = FullPairsCopy[`Runde:${rounds}`][0].split(' + ')
-                console.log(WinnerTeam,'WinnerTeam')
-                var First = WinnerTeam[0];
-                WinnerTeam.shift();
-                var Second = WinnerTeam[0];
-                WinnerTeam.shift();
+                ManegeTierlist(rounds)
+            } 
+            if (GameResult == 2) {
                 FullPairsCopy[`Runde:${rounds}`].shift()
-                Tierlist[First] = +1
-                Tierlist[Second] = +1
-                TournamentPairs[`Runde:${rounds}`].shift(TournamentPairs[`Runde:${rounds}`][0]);
-                console.log(Tierlist)
-            } else {
-
+                ManegeTierlist(rounds)
             }
         }
     }
+    var sortedTierlist = Object.fromEntries( // Sorts the list from higest to lowest
+        Object.entries(Tierlist).sort(([, a], [, b]) => b - a)
+    );
+    for (var key in sortedTierlist) { // Loop through sortedTierlsit
+        if (sortedTierlist.hasOwnProperty(key)) { // check if obj contains certain Key with a certain value
+            if (!PlacementHolder.includes(sortedTierlist[key])) {
+                PlacementHolder.push(sortedTierlist[key])
+                console.log(PlacementHolder,'PlacementHolder')
+            }
+        }
+    }
+    for (var Index = 0 ; Index < PlacementHolder ; Index++) {
+        var WinCounter = PlacementHolder[Index]
+        var IndexWinCounterObj = Object.values(sortedTierlist).indexOf(WinCounter) // find the index of the Win counter ( Number ) inside sortedTierlist
+        var Key = Object.keys(sortedTierlist).find(key => sortedTierlist[key] === IndexWinCounterObj); // Find Key by value inside sortedTierlist
+        console.log(Key, 'Key')
+    }
+    console.log(sortedTierlist);//Ende
 }
 
 function MakeFullRounds() { //5
@@ -73,7 +105,6 @@ function MakeFullRounds() { //5
             TournamentPairs[`Runde:${rounds}`].push(`${First} gegen ${Second}`)
         }
     }
-    console.log(TournamentPairs, 'TorunamentPairs')
 }
 
 function RefillCopy() {//3
@@ -130,9 +161,9 @@ function GetInput() { //1
     }
     else {
         Player.push(Input)
-        PlayerCopy.push(Input)^
+        PlayerCopy.push(Input)
         Tierlist[Input]
-        console.log(Tierlist)
+        console.log(Tierlist,'Tierlsit after first push')
         GetInput()
     }
 }
