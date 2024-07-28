@@ -1,9 +1,9 @@
 var InputGroup = 'Gruppe A'
 var UsedPairs = [];
-var UsedSinglePairs = [];
+var UsedSingle = [];
 var GroupA = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
 var GroupB = ["14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27"];
-var MaxRoundLength = Math.floor((GroupA.length + GroupB.length) / 2 );
+var MaxRoundLength = Math.floor((GroupA.length + GroupB.length) / 2  );
 var SearchCount = 0;
 var ACopy = [];
 var BCopy = [];
@@ -138,15 +138,18 @@ function MakePairs(rounds) { //4
         console.log(ACopy,'Acopy')
         console.log(BCopy,'BCopy')
         console.log(First, Second,'First Second')
-        if (UsedPairs.includes(`${First}${Second}`) === true || UsedPairs.includes(`${First}${Second}`) === true || UsedSinglePairs.includes(First) === true || UsedSinglePairs.includes(Second) === true) {
+        if (UsedPairs.includes(`${First}${Second}`) === true || UsedPairs.includes(`${First}${Second}`) === true || UsedSingle.includes(First) === true || UsedSingle.includes(Second) === true) {
             ACopy.push(First);
             BCopy.push(Second);
             shuffleGroups()
             SearchCount += 1; 
         } 
         else {
-            UsedSinglePairs.push(`${First}`)
-            UsedSinglePairs.push(`${Second}`)
+            if (Second === undefined) {
+                Second = 'Kein Spielpartner mehr übrig'
+            }
+            UsedSingle.push(`${First}`)
+            UsedSingle.push(`${Second}`)
             UsedPairs.push(`${First}${Second}`,`${Second}${First}`)
             FullPairs[`Runde:${rounds}`].push(`${First} + ${Second}`);
             FullPairsCopy[`Runde:${rounds}`].push(`${First} + ${Second}`)
@@ -167,7 +170,7 @@ function HandleRounds() { //2
         RefillCopys()//3
         console.log('start')
         MakePairs(rounds)//4
-        UsedSinglePairs = [];
+        UsedSingle = [];
         console.log('end')
     }
     MakeFullRounds()//5
