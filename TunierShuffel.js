@@ -1,12 +1,9 @@
 var InputGroup = 'Gruppe A'
 var UsedPairs = [];
 var UsedSingle = [];
-var GroupA = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
-var GroupB = ["14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27"];
-var MaxRoundLength = Math.floor((GroupA.length + GroupB.length) / 2  );
-var SearchCount = 0;
-var ACopy = [];
-var BCopy = [];
+var GroupA = ["Zargon", "Blix", "Klimbo", "Xylo"]; 
+var GroupB = ["Glimmer", "Sprocket", "Rando", "Flint"]; 
+var MaxRoundLength = Math.floor((GroupA.length + GroupB.length));
 var FullPairs = {
     'Runde:1': [],
     'Runde:2': [],
@@ -38,21 +35,21 @@ var TournamentPairs = {
     'Runde:8': [],
 }
 var Tierlist = {};
-var PlacementHolder = [];
 
 const prompt = require("prompt-sync")({ sigint: true });
-var shuffle = require('shuffle-array')
 
-function shuffleGroups() {
-    shuffle(ACopy)
-    shuffle(BCopy)
+function HandlePoints(FullPoints,First,Second,rounds) {
+    var SetResults = FullPoints.split(' ')
+    console.log(SetResults,'SetResults')
+    var SinglePoints = SetResults.forEach( (item) => {
+        item.split(':')
+    })
+    console.log(SinglePoints,'SinglePoints')
+
+
+    SinglePoints
 }
-
-function ManegeTierlist(rounds) {
-    for (var i = 0; i < GroupA.length; i++) {
-        Tierlist[GroupA[i]] = 0 ;
-        Tierlist[GroupB[i]] = 0 ;
-    }
+function ManegeTierlist(rounds,FullPoints) {
     if ( FullPairsCopy[`Runde:${rounds}`][0] == 'kein übriges Team') {
         return
     } else {
@@ -60,123 +57,137 @@ function ManegeTierlist(rounds) {
         var First = WinnerTeam[0];
         WinnerTeam.shift();
         var Second = WinnerTeam[0];
+        HandlePoints(FullPoints,First,Second,rounds)
         WinnerTeam.shift();
         FullPairsCopy[`Runde:${rounds}`].shift()
-        Tierlist[First] +=1
-        Tierlist[Second] +=1
+        Tierlist[First]['Points:'] += 3
+        Tierlist[Second]['Points:'] += 3
         TournamentPairs[`Runde:${rounds}`].shift(TournamentPairs[`Runde:${rounds}`][0]);
     }
 } 
-
 function MenageGameResults() {//7
+    for (var i = 0; i === GroupA.length; i++) {
+        Tierlist[GroupA[i]].Points = 0 ;
+        Tierlist[GroupB[i]].Points = 0 ;
+    }
     console.log('Gibt an welches Team gewonnen hat (Für das erste Team "1" eingeben oder für das zweite Team "2" eigeben):')
     for (var rounds = 1 ; rounds < 9 ; rounds++) {
         console.log('Runde ',rounds,':')
         while (TournamentPairs[`Runde:${rounds}`].length) {
             console.log(`${TournamentPairs[`Runde:${rounds}`][0]}:`)
             var GameResult = prompt();
+            console.log('Gib das Ergebnis des Spiels an:')
+            var FullPoints = prompt();
             if(GameResult == 1) {
-                ManegeTierlist(rounds)
+                ManegeTierlist(rounds,FullPoints)
             } 
             if (GameResult == 2) {
                 FullPairsCopy[`Runde:${rounds}`].shift()
-                ManegeTierlist(rounds)
+                ManegeTierlist(rounds,FullPoints)
             }
         }
     }
-    var sortedTierlist = Object.fromEntries( // Sorts the list from higest to lowest
-        Object.entries(Tierlist).sort(([, a], [, b]) => b - a)
-    );
-    for (var key in sortedTierlist) { // Loop through sortedTierlsit
-        if (sortedTierlist.hasOwnProperty(key)) { // check if obj contains certain Key with a certain value
-            if (!PlacementHolder.includes(sortedTierlist[key])) {
-                PlacementHolder.push(sortedTierlist[key])
-            }
-        }
+    let sortable = [];
+    for (var Person in Tierlist) {
+    sortable.push([Person, Tierlist[Person]]);
     }
-    for (var Index = 0 ; Index < PlacementHolder ; Index++) {
-        var WinCounter = PlacementHolder[Index]
-        var IndexWinCounterObj = Object.values(sortedTierlist).indexOf(WinCounter) // find the index of the Win counter ( Number ) inside sortedTierlist
-        var Key = Object.keys(sortedTierlist).find(key => sortedTierlist[key] === IndexWinCounterObj); // Find Key by value inside sortedTierlist
-    }
-    console.log('Ergebnis aller Runden:',sortedTierlist);//Ende
+    sortable.sort(function(a, b) {
+        return b[1] - a[1];
+    });
+    let objSorted = {}
+    sortable.forEach(function(item){
+        objSorted[item[0]] = item[1]
+    })
+    console.log('Ergebnis aller Runden:', objSorted)
 }
-
 function MakeFullRounds() { //5
     for (let rounds = 1; rounds < 9; rounds++) {
         while (FullPairs[`Runde:${rounds}`].length > 0) {
             var First = FullPairs[`Runde:${rounds}`][0]
             FullPairs[`Runde:${rounds}`].shift()
             var Second = FullPairs[`Runde:${rounds}`][0]
+            if (Second === undefined ) {
+                Second =  'Keine weitere Paarungen möglich'
+            }
             FullPairs[`Runde:${rounds}`].shift()
             TournamentPairs[`Runde:${rounds}`].push(`${First} gegen ${Second}`)
         }
     }
     console.log(TournamentPairs)
-    console.log(MaxRoundLength, 'MaxRoundLength')
 }
-
-function RefillCopys() {//3
-    for (var i = 0; i < GroupA.length; i++) {
-        if (!ACopy.includes(GroupA[i])) {
-            ACopy.push(GroupA[i]);
-        }
-    }
-    for (var i2 = 0; i2 < GroupB.length; i2++) {
-        if (!BCopy.includes(GroupB[i2])) {
-            BCopy.push(GroupB[i2]);
-        }
-    }
-}
-
-function MakePairs(rounds) { //4
-    while (ACopy.length > 0 && BCopy.length > 0) {
-        var First = ACopy[0];
-        ACopy.shift();
-        var Second = BCopy[0];
-        BCopy.shift();
-        console.log(ACopy,'Acopy')
-        console.log(BCopy,'BCopy')
-        console.log(First, Second,'First Second')
-        if (UsedPairs.includes(`${First}${Second}`) === true || UsedPairs.includes(`${First}${Second}`) === true || UsedSingle.includes(First) === true || UsedSingle.includes(Second) === true) {
-            ACopy.push(First);
-            BCopy.push(Second);
-            shuffleGroups()
-            SearchCount += 1; 
-        } 
-        else {
-            if (Second === undefined) {
-                Second = 'Kein Spielpartner mehr übrig'
+function Retry(rounds) {
+    if(UsedSingle.length == MaxRoundLength) {
+        for(var AFinder2 = 0; AFinder2 < GroupA.length; AFinder2++) {
+            var First = GroupA[AFinder2];
+            for(var BFinder2 = 0; BFinder2 < GroupB.length; BFinder2++) {
+                var Second = GroupB[BFinder2]
+                if (UsedPairs.includes(`${First}${Second}`) === true || UsedPairs.includes(`${First}${Second}`) === true || UsedSingle.includes(First) === true || UsedSingle.includes(Second) === true) {
+                }
+                else {
+                    UsedSingle.push(`${First}`)
+                    UsedSingle.push(`${Second}`)
+                    UsedPairs.push(`${First}${Second}`,`${Second}${First}`)
+                    FullPairs[`Runde:${rounds}`].push(`${First} + ${Second}`);
+                    FullPairsCopy[`Runde:${rounds}`].push(`${First} + ${Second}`)
+                }
             }
-            UsedSingle.push(`${First}`)
-            UsedSingle.push(`${Second}`)
-            UsedPairs.push(`${First}${Second}`,`${Second}${First}`)
-            FullPairs[`Runde:${rounds}`].push(`${First} + ${Second}`);
-            FullPairsCopy[`Runde:${rounds}`].push(`${First} + ${Second}`)
-            SearchCount = 0;
-        }
-        if ( FullPairs[`Runde:${rounds}`].length === MaxRoundLength ) {
-            return
-        }
-        if (SearchCount > 10000) {
-            return
-        }
-        RefillCopys()
+        }   
     }
 }
+function MakePairs(rounds) {
+    UsedSingle = [];
+    for (var AFinder = 0; AFinder < GroupA.length; AFinder++) {
+        var First = GroupA[AFinder];
+        for (var BFinder = 0; BFinder < GroupB.length; BFinder++) {
+            var Second = GroupB[BFinder];
+            if (
+                UsedPairs.includes(`${First}${Second}`) || 
+                UsedPairs.includes(`${Second}${First}`) || 
+                UsedSingle.includes(First) || 
+                UsedSingle.includes(Second)
+            ) {
+                continue; 
+            }
+            UsedSingle.push(First);
+            UsedSingle.push(Second);
+            UsedPairs.push(`${First}${Second}`, `${Second}${First}`);
+            FullPairs[`Runde:${rounds}`].push(`${First} + ${Second}`);
+            FullPairsCopy[`Runde:${rounds}`].push(`${First} + ${Second}`);
+        }
+    }
+    let remainingGroupA = GroupA.filter(participant => !UsedSingle.includes(participant));
+    let remainingGroupB = GroupB.filter(participant => !UsedSingle.includes(participant));
 
+    while (remainingGroupA.length > 0 || remainingGroupB.length > 0) {
+        const First = remainingGroupA.length > 0 ? remainingGroupA.shift() : null;
+        const Second = remainingGroupB.length > 0 ? remainingGroupB.shift() : null;
+
+        if (First && Second) {
+            FullPairs[`Runde:${rounds}`].push(`${First} + ${Second}`);
+            FullPairsCopy[`Runde:${rounds}`].push(`${First} + ${Second}`);
+            UsedPairs.push(`${First}${Second}`, `${Second}${First}`);
+        } else if (First && !Second) {
+            FullPairs[`Runde:${rounds}`].push(`${First} + Kein Spieler mehr übrig`);
+            FullPairsCopy[`Runde:${rounds}`].push(`${First} + Kein Spieler mehr übrig`);
+            UsedPairs.push(`${First}Kein Spieler mehr übrig`);
+        } else if (Second && !First) {
+            FullPairs[`Runde:${rounds}`].push(`${Second} + Kein Spieler mehr übrig`);
+            FullPairsCopy[`Runde:${rounds}`].push(`${Second} + Kein Spieler mehr übrig`);
+            UsedPairs.push(`Kein Spieler mehr übrig${Second}`);
+        }
+    }
+    if (FullPairs[`Runde:${rounds}`].length < 10) {
+        Retry(rounds);
+    }
+}
 function HandleRounds() { //2
     for (let rounds = 1; rounds < 9; rounds++) {
-        RefillCopys()//3
-        console.log('start')
-        MakePairs(rounds)//4
-        UsedSingle = [];
-        console.log('end')
+        UsedSingle = [];//4
+        MakePairs(rounds)
     }
     MakeFullRounds()//5
     MenageGameResults()
 }
-
 function GetInput() { //1
     var Input = prompt(`Gibt einen Teilnehmer für ${InputGroup} ein (Wenn du fertig sind geben sie "fertig" ein): `);
     if (Input == 'weiter') {
@@ -200,7 +211,6 @@ function GetInput() { //1
 }
 
 GetInput()
-
 
 console.log("Drücken Sie die Eingabetaste, um das Fenster zu schließen...");
 prompt()
