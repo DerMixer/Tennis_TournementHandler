@@ -41,13 +41,11 @@ const prompt = require("prompt-sync")({ sigint: true });
 function HandlePoints(FullPoints,First,Second,rounds) {
     var SetResults = FullPoints.split(' ')
     console.log(SetResults,'SetResults')
-    var SinglePoints = SetResults.forEach( (item) => {
-        item.split(':')
+    var SinglePoints = []
+    SetResults.forEach( (item) => {
+        SinglePoints.push(item.split(':'))
     })
     console.log(SinglePoints,'SinglePoints')
-
-
-    SinglePoints
 }
 function ManegeTierlist(rounds,FullPoints) {
     if ( FullPairsCopy[`Runde:${rounds}`][0] == 'kein übriges Team') {
@@ -60,15 +58,17 @@ function ManegeTierlist(rounds,FullPoints) {
         HandlePoints(FullPoints,First,Second,rounds)
         WinnerTeam.shift();
         FullPairsCopy[`Runde:${rounds}`].shift()
-        Tierlist[First]['Points:'] += 3
-        Tierlist[Second]['Points:'] += 3
+        Tierlist[First]['Punkte:'] += 3
+        Tierlist[Second]['Punkte:'] += 3
         TournamentPairs[`Runde:${rounds}`].shift(TournamentPairs[`Runde:${rounds}`][0]);
     }
 } 
 function MenageGameResults() {//7
     for (var i = 0; i === GroupA.length; i++) {
-        Tierlist[GroupA[i]].Points = 0 ;
-        Tierlist[GroupB[i]].Points = 0 ;
+        Tierlist[GroupA[i]]
+        Tierlist[GroupB[i]]
+        Tierlist[GroupA[i]]['Punkte:'] = 0 ;
+        Tierlist[GroupB[i]]['Punkte:'] = 0 ;
     }
     console.log('Gibt an welches Team gewonnen hat (Für das erste Team "1" eingeben oder für das zweite Team "2" eigeben):')
     for (var rounds = 1 ; rounds < 9 ; rounds++) {
