@@ -38,7 +38,7 @@ var Tierlist = {};
 
 const prompt = require("prompt-sync")({ sigint: true });
 
-function HandlePoints(FullPoints,First,Second,rounds) {
+function HandlePoints(FullPoints,First,Second,rounds,GameResult) {
     var SetResults = FullPoints.split(' ')
     console.log(SetResults,'SetResults')
     var SinglePoints = []
@@ -46,6 +46,19 @@ function HandlePoints(FullPoints,First,Second,rounds) {
         SinglePoints.push(item.split(':'))
     })
     console.log(SinglePoints,'SinglePoints')
+    var WonPoints
+    var LostPoints
+    if (GameResult === 1) {
+        SetResults.forEach( (item) => {
+            WonPoints = Number(item[0])
+        })
+    } else {
+        SetResults.forEach( (item) => {
+            Number(item[1])
+        })
+    }
+    Tierlist[First]['Punkteverhältnis'] = 
+    Tierlist[Second]['Punkteverhältnis'] =
 }
 function ManegeTierlist(rounds,FullPoints) {
     if ( FullPairsCopy[`Runde:${rounds}`][0] == 'kein übriges Team') {
@@ -55,21 +68,26 @@ function ManegeTierlist(rounds,FullPoints) {
         var First = WinnerTeam[0];
         WinnerTeam.shift();
         var Second = WinnerTeam[0];
-        HandlePoints(FullPoints,First,Second,rounds)
+        HandlePoints(FullPoints,First,Second,rounds,GameResult)
         WinnerTeam.shift();
         FullPairsCopy[`Runde:${rounds}`].shift()
+        console.log(First,Second,'First Second')
+        console.log(Tierlist, 'Tierlist')
         Tierlist[First]['Punkte:'] += 3
         Tierlist[Second]['Punkte:'] += 3
         TournamentPairs[`Runde:${rounds}`].shift(TournamentPairs[`Runde:${rounds}`][0]);
     }
 } 
 function MenageGameResults() {//7
-    for (var i = 0; i === GroupA.length; i++) {
-        Tierlist[GroupA[i]]
-        Tierlist[GroupB[i]]
+    for (var i = 0; i < GroupA.length; i++) {
+        Tierlist[GroupA[i]] = {}
+        Tierlist[GroupB[i]] = {}
         Tierlist[GroupA[i]]['Punkte:'] = 0 ;
         Tierlist[GroupB[i]]['Punkte:'] = 0 ;
+        Tierlist[GroupA[i]]['Punkteverhältnis:'] = 0 ;
+        Tierlist[GroupB[i]]['Punkteverhältnis:'] = 0 ;
     }
+    console.log(Tierlist);
     console.log('Gibt an welches Team gewonnen hat (Für das erste Team "1" eingeben oder für das zweite Team "2" eigeben):')
     for (var rounds = 1 ; rounds < 9 ; rounds++) {
         console.log('Runde ',rounds,':')
@@ -79,11 +97,11 @@ function MenageGameResults() {//7
             console.log('Gib das Ergebnis des Spiels an:')
             var FullPoints = prompt();
             if(GameResult == 1) {
-                ManegeTierlist(rounds,FullPoints)
+                ManegeTierlist(rounds,FullPoints,GameResult)
             } 
             if (GameResult == 2) {
                 FullPairsCopy[`Runde:${rounds}`].shift()
-                ManegeTierlist(rounds,FullPoints)
+                ManegeTierlist(rounds,FullPoints,GameResult)
             }
         }
     }
