@@ -48,19 +48,33 @@ function HandlePoints(FullPoints,First,Second,rounds,GameResult) {
     console.log(SinglePoints,'SinglePoints')
     var WonPoints
     var LostPoints
-    if (GameResult === 1) {
-        SetResults.forEach( (item) => {
-            WonPoints = Number(item[0])
-        })
+    var Ratio
+    if (GameResult == 1) {
+        SinglePoints.forEach( (item) => {
+            WonPoints = parseInt(item[0])
+            LostPoints = parseInt(item[1])
+            Ratio = WonPoints - LostPoints
+            console.log(item[0],'item 0' )
+            console.log(item[1],'item 1' )
+            console.log(WonPoints,'WonPoints')
+            console.log(LostPoints,'LostPoints')
+            console.log(WonPoints - LostPoints,'Verhältnis')
+            console.log(Ratio,'Ratio',typeof(Ratio))
+        },
+        Tierlist[First]['Punkteverhältnis'] += Ratio,
+        Tierlist[Second]['Punkteverhältnis'] += Ratio
+    )
     } else {
         SetResults.forEach( (item) => {
-            Number(item[1])
+            WonPoints = parseInt(item[1])
+            LostPoints = parseInt(item[0])
+            Tierlist[First]['Punkteverhältnis'] = WonPoints - LostPoints
+            Tierlist[Second]['Punkteverhältnis'] = WonPoints - LostPoints
         })
     }
-    Tierlist[First]['Punkteverhältnis'] = 
-    Tierlist[Second]['Punkteverhältnis'] =
 }
-function ManegeTierlist(rounds,FullPoints) {
+
+function ManegeTierlist(rounds,FullPoints,GameResult) {
     if ( FullPairsCopy[`Runde:${rounds}`][0] == 'kein übriges Team') {
         return
     } else {
@@ -71,7 +85,6 @@ function ManegeTierlist(rounds,FullPoints) {
         HandlePoints(FullPoints,First,Second,rounds,GameResult)
         WinnerTeam.shift();
         FullPairsCopy[`Runde:${rounds}`].shift()
-        console.log(First,Second,'First Second')
         console.log(Tierlist, 'Tierlist')
         Tierlist[First]['Punkte:'] += 3
         Tierlist[Second]['Punkte:'] += 3
@@ -84,8 +97,6 @@ function MenageGameResults() {//7
         Tierlist[GroupB[i]] = {}
         Tierlist[GroupA[i]]['Punkte:'] = 0 ;
         Tierlist[GroupB[i]]['Punkte:'] = 0 ;
-        Tierlist[GroupA[i]]['Punkteverhältnis:'] = 0 ;
-        Tierlist[GroupB[i]]['Punkteverhältnis:'] = 0 ;
     }
     console.log(Tierlist);
     console.log('Gibt an welches Team gewonnen hat (Für das erste Team "1" eingeben oder für das zweite Team "2" eigeben):')
