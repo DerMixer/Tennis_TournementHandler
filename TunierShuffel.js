@@ -54,12 +54,6 @@ function HandlePoints(FullPoints,First,Second,rounds,GameResult) {
             WonPoints = parseInt(item[0])
             LostPoints = parseInt(item[1])
             Ratio = WonPoints - LostPoints
-            console.log(item[0],'item 0' )
-            console.log(item[1],'item 1' )
-            console.log(WonPoints,'WonPoints')
-            console.log(LostPoints,'LostPoints')
-            console.log(WonPoints - LostPoints,'Verhältnis')
-            console.log(Ratio,'Ratio',typeof(Ratio))
             Tierlist[First]['Punkteverhältnis'] += Ratio
             Tierlist[Second]['Punkteverhältnis'] += Ratio
 
@@ -68,18 +62,27 @@ function HandlePoints(FullPoints,First,Second,rounds,GameResult) {
 
             Tierlist[First]['Verlorene Punkte:'] += LostPoints
             Tierlist[Second]['Verlorene Punkte:'] += LostPoints
-
-            Tierlist[First]['Punkte:'] += 3
-            Tierlist[Second]['Punkte:'] += 3
-        }
+        },
+        Tierlist[First]['Punkte:'] += 3,
+        Tierlist[Second]['Punkte:'] += 3
     )
     } else {
         SetResults.forEach( (item) => {
             WonPoints = parseInt(item[1])
             LostPoints = parseInt(item[0])
-            Tierlist[First]['Punkteverhältnis'] = WonPoints - LostPoints
-            Tierlist[Second]['Punkteverhältnis'] = WonPoints - LostPoints
-        })
+            Ratio = WonPoints - LostPoints
+            Tierlist[First]['Punkteverhältnis'] += Ratio
+            Tierlist[Second]['Punkteverhältnis'] += Ratio
+
+            Tierlist[First]['Gewonnene Punkte:'] += WonPoints
+            Tierlist[Second]['Gewonnene Punkte:'] += WonPoints
+
+            Tierlist[First]['Verlorene Punkte:'] += LostPoints
+            Tierlist[Second]['Verlorene Punkte:'] += LostPoints
+        },
+        Tierlist[First]['Punkte:'] += 3,
+        Tierlist[Second]['Punkte:'] += 3
+        }
     }
 }
 
