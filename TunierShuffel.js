@@ -38,14 +38,28 @@ var Tierlist = {};
 
 const prompt = require("prompt-sync")({ sigint: true });
 
-function HandlePoints(FullPoints,First,Second,rounds,GameResult) {
+function Append (WonPoints,LostPoints,Ratio,First,Second) { //Adds all Data to Player objects
+    Ratio = WonPoints - LostPoints
+    console.log(Ratio,'Ratio')
+    Tierlist[First]['Punkteverhältnis'] += Ratio
+    Tierlist[Second]['Punkteverhältnis'] += Ratio
+
+    Tierlist[First]['Gewonnene Punkte:'] += WonPoints
+    Tierlist[Second]['Gewonnene Punkte:'] += WonPoints
+
+    Tierlist[First]['Verlorene Punkte:'] += LostPoints
+    Tierlist[Second]['Verlorene Punkte:'] += LostPoints
+
+    Tierlist[First]['Punkte:'] += 3
+    Tierlist[Second]['Punkte:'] += 3
+
+}
+function HandlePoints(FullPoints,First,Second,GameResult) {
     var SetResults = FullPoints.split(' ')
-    console.log(SetResults,'SetResults')
     var SinglePoints = []
     SetResults.forEach( (item) => {
         SinglePoints.push(item.split(':'))
     })
-    console.log(SinglePoints,'SinglePoints')
     var WonPoints
     var LostPoints
     var Ratio
@@ -53,36 +67,22 @@ function HandlePoints(FullPoints,First,Second,rounds,GameResult) {
         SinglePoints.forEach( (item) => {
             WonPoints = parseInt(item[0])
             LostPoints = parseInt(item[1])
-            Ratio = WonPoints - LostPoints
-            Tierlist[First]['Punkteverhältnis'] += Ratio
-            Tierlist[Second]['Punkteverhältnis'] += Ratio
 
-            Tierlist[First]['Gewonnene Punkte:'] += WonPoints
-            Tierlist[Second]['Gewonnene Punkte:'] += WonPoints
+            console.log(item[0],'item',typeof(item[0]))
 
-            Tierlist[First]['Verlorene Punkte:'] += LostPoints
-            Tierlist[Second]['Verlorene Punkte:'] += LostPoints
-        },
-        Tierlist[First]['Punkte:'] += 3,
-        Tierlist[Second]['Punkte:'] += 3
+            console.log(WonPoints,'Wonpoints')
+            console.log(LostPoints,'LostPoints')
+            Append(WonPoints,LostPoints,Ratio,First,Second)
+        }
     )
     } else {
         SetResults.forEach( (item) => {
             WonPoints = parseInt(item[1])
             LostPoints = parseInt(item[0])
-            Ratio = WonPoints - LostPoints
-            Tierlist[First]['Punkteverhältnis'] += Ratio
-            Tierlist[Second]['Punkteverhältnis'] += Ratio
-
-            Tierlist[First]['Gewonnene Punkte:'] += WonPoints
-            Tierlist[Second]['Gewonnene Punkte:'] += WonPoints
-
-            Tierlist[First]['Verlorene Punkte:'] += LostPoints
-            Tierlist[Second]['Verlorene Punkte:'] += LostPoints
-        },
-        Tierlist[First]['Punkte:'] += 3,
-        Tierlist[Second]['Punkte:'] += 3
-        }
+            console.log(WonPoints,'Wonpoints')
+            console.log(LostPoints,'LostPoints')
+            Append(WonPoints,LostPoints,Ratio,First,Second)
+        })
     }
 }
 
@@ -102,18 +102,6 @@ function ManegeTierlist(rounds,FullPoints,GameResult) {
     }
 } 
 function MenageGameResults() {//7
-    for (var i = 0; i < GroupA.length; i++) {
-        Tierlist[GroupA[i]] = {}
-        Tierlist[GroupB[i]] = {}
-        Tierlist[GroupA[i]]['Punkte:'] = 0 ;
-        Tierlist[GroupB[i]]['Punkte:'] = 0 ;
-        Tierlist[GroupA[i]]['Punkteverhältnis'] = 0
-        Tierlist[GroupB[i]]['Punkteverhältnis'] = 0
-        Tierlist[GroupA[i]]['Gewonnene Punkte:'] = 0
-        Tierlist[GroupB[i]]['Gewonnene Punkte:'] = 0
-        Tierlist[GroupA[i]]['Verlorene Punkte:'] = 0
-        Tierlist[GroupB[i]]['Verlorene Punkte:'] = 0
-    }
     console.log(Tierlist);
     console.log('Gibt an welches Team gewonnen hat (Für das erste Team "1" eingeben oder für das zweite Team "2" eigeben):')
     for (var rounds = 1 ; rounds < 9 ; rounds++) {
@@ -226,6 +214,18 @@ function MakePairs(rounds) {
     }
 }
 function HandleRounds() { //2
+    for (var i = 0; i < GroupA.length; i++) {
+        Tierlist[GroupA[i]] = {}
+        Tierlist[GroupB[i]] = {}
+        Tierlist[GroupA[i]]['Punkte:'] = 0 ;
+        Tierlist[GroupB[i]]['Punkte:'] = 0 ;
+        Tierlist[GroupA[i]]['Punkteverhältnis'] = 0
+        Tierlist[GroupB[i]]['Punkteverhältnis'] = 0
+        Tierlist[GroupA[i]]['Gewonnene Punkte:'] = 0
+        Tierlist[GroupB[i]]['Gewonnene Punkte:'] = 0
+        Tierlist[GroupA[i]]['Verlorene Punkte:'] = 0
+        Tierlist[GroupB[i]]['Verlorene Punkte:'] = 0
+    }
     for (let rounds = 1; rounds < 9; rounds++) {
         UsedSingle = [];//4
         MakePairs(rounds)
