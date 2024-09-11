@@ -40,7 +40,6 @@ const prompt = require("prompt-sync")({ sigint: true });
 
 function Append (WonPoints,LostPoints,Ratio,First,Second) { //Adds all Data to Player objects
     Ratio = WonPoints - LostPoints
-    console.log(Ratio,'Ratio')
     Tierlist[First]['Punkteverhältnis'] += Ratio
     Tierlist[Second]['Punkteverhältnis'] += Ratio
 
@@ -63,24 +62,17 @@ function HandlePoints(FullPoints,First,Second,GameResult) {
     var WonPoints
     var LostPoints
     var Ratio
-    if (GameResult == 1) {
+    if (GameResult === '1') {
         SinglePoints.forEach( (item) => {
             WonPoints = parseInt(item[0])
             LostPoints = parseInt(item[1])
-
-            console.log(item[0],'item',typeof(item[0]))
-
-            console.log(WonPoints,'Wonpoints')
-            console.log(LostPoints,'LostPoints')
             Append(WonPoints,LostPoints,Ratio,First,Second)
         }
     )
     } else {
-        SetResults.forEach( (item) => {
+        SinglePoints.forEach( (item) => {
             WonPoints = parseInt(item[1])
             LostPoints = parseInt(item[0])
-            console.log(WonPoints,'Wonpoints')
-            console.log(LostPoints,'LostPoints')
             Append(WonPoints,LostPoints,Ratio,First,Second)
         })
     }
@@ -113,25 +105,30 @@ function MenageGameResults() {//7
             var FullPoints = prompt();
             if(GameResult == 1) {
                 ManegeTierlist(rounds,FullPoints,GameResult)
+                console.log(GameResult,'Gameresult')
             } 
             if (GameResult == 2) {
                 FullPairsCopy[`Runde:${rounds}`].shift()
+                console.log(GameResult,'Gameresult')
                 ManegeTierlist(rounds,FullPoints,GameResult)
             }
         }
     }
-    let sortable = [];
-    for (var Person in Tierlist) {
-    sortable.push([Person, Tierlist[Person]]);
-    }
-    sortable.sort(function(a, b) {
-        return b[1] - a[1];
-    });
-    let objSorted = {}
-    sortable.forEach(function(item){
-        objSorted[item[0]] = item[1]
-    })
-    console.log('Ergebnis aller Runden:', objSorted)
+    //let sortable = [];
+    //for (var Person in Tierlist) {
+    //sortable.push([Person, Tierlist[Person]]);
+    //}
+    //sortable.sort(function(a, b) {
+    //    return b[1] - a[1];
+    //});
+    //let objSorted = {}
+    //sortable.forEach(function(item){
+    //    objSorted[item[0]] = item[1]
+    //})
+    const sortedByPunkte = Object.entries(ergebnis)
+  .sort(([, a], [, b]) => b['Punkte:'] - a['Punkte:']) // Sorting in descending order
+  .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+    console.log('Ergebnis aller Runden:', sortedByPunkte)
 }
 function MakeFullRounds() { //5
     for (let rounds = 1; rounds < 9; rounds++) {
