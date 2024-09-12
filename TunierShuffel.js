@@ -125,9 +125,10 @@ function MenageGameResults() {//7
     //sortable.forEach(function(item){
     //    objSorted[item[0]] = item[1]
     //})
-    const sortedByPunkte = Object.entries(ergebnis)
-  .sort(([, a], [, b]) => b['Punkte:'] - a['Punkte:']) // Sorting in descending order
-  .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+    
+    const sortedByPunkte = Object.entries(Tierlist)
+    .sort(([, a], [, b]) => b['Punkte:'] - a['Punkte:']) // Sorting in descending order
+    .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
     console.log('Ergebnis aller Runden:', sortedByPunkte)
 }
 function MakeFullRounds() { //5
@@ -223,7 +224,7 @@ function HandleRounds() { //2
         Tierlist[GroupA[i]]['Verlorene Punkte:'] = 0
         Tierlist[GroupB[i]]['Verlorene Punkte:'] = 0
     }
-    for (let rounds = 1; rounds < 9; rounds++) {
+    for (let rounds = 1; rounds < 2; rounds++) {
         UsedSingle = [];//4
         MakePairs(rounds)
     }
