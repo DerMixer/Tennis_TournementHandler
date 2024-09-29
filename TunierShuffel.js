@@ -62,7 +62,7 @@ function HandlePoints(FullPoints,First,Second,GameResult) {
     var WonPoints
     var LostPoints
     var Ratio
-    if (GameResult === '1') {
+    if (GameResult === 1) {
         SinglePoints.forEach( (item) => {
             WonPoints = parseInt(item[0])
             LostPoints = parseInt(item[1])
@@ -89,12 +89,10 @@ function ManegeTierlist(rounds,FullPoints,GameResult) {
         HandlePoints(FullPoints,First,Second,rounds,GameResult)
         WinnerTeam.shift();
         FullPairsCopy[`Runde:${rounds}`].shift()
-        console.log(Tierlist, 'Tierlist')
         TournamentPairs[`Runde:${rounds}`].shift(TournamentPairs[`Runde:${rounds}`][0]);
     }
 } 
 function MenageGameResults() {//7
-    console.log(Tierlist);
     console.log('Gibt an welches Team gewonnen hat (Für das erste Team "1" eingeben oder für das zweite Team "2" eigeben):')
     for (var rounds = 1 ; rounds < 9 ; rounds++) {
         console.log('Runde ',rounds,':')
@@ -105,31 +103,28 @@ function MenageGameResults() {//7
             var FullPoints = prompt();
             if(GameResult == 1) {
                 ManegeTierlist(rounds,FullPoints,GameResult)
-                console.log(GameResult,'Gameresult')
             } 
             if (GameResult == 2) {
                 FullPairsCopy[`Runde:${rounds}`].shift()
-                console.log(GameResult,'Gameresult')
                 ManegeTierlist(rounds,FullPoints,GameResult)
             }
         }
     }
-    //let sortable = [];
-    //for (var Person in Tierlist) {
-    //sortable.push([Person, Tierlist[Person]]);
-    //}
-    //sortable.sort(function(a, b) {
-    //    return b[1] - a[1];
-    //});
-    //let objSorted = {}
-    //sortable.forEach(function(item){
-    //    objSorted[item[0]] = item[1]
-    //})
-    
-    const sortedByPunkte = Object.entries(Tierlist)
-    .sort(([, a], [, b]) => b['Punkte:'] - a['Punkte:']) // Sorting in descending order
-    .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
-    console.log('Ergebnis aller Runden:', sortedByPunkte)
+// Step 1: Retrieve the keys of the object
+const sortedKeys = Object.keys(Tierlist).sort((a, b) => {
+    // Step 2: Sort based on the 'name' sub-key
+    if (Tierlist[a].name < Tierlist[b].name) return -1;
+    if (Tierlist[a].name > Tierlist[b].name) return 1;
+    return 0;
+  });
+  
+  // Step 3: Rebuild the sorted object
+  const sortedObj = {};
+  sortedKeys.forEach(key => {
+    sortedObj[key] = Tierlist[key];
+  });
+  
+  console.log(sortedObj,'sortedTierlist');
 }
 function MakeFullRounds() { //5
     for (let rounds = 1; rounds < 9; rounds++) {
@@ -144,7 +139,7 @@ function MakeFullRounds() { //5
             TournamentPairs[`Runde:${rounds}`].push(`${First} gegen ${Second}`)
         }
     }
-    console.log(TournamentPairs)
+    console.log(TournamentPairs,'TournamentPairs')
 }
 function Retry(rounds) {
     if(UsedSingle.length == MaxRoundLength) {
