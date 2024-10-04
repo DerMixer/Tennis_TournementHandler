@@ -34,23 +34,25 @@ var TournamentPairs = {
     'Runde:7': [],
     'Runde:8': [],
 }
-var Tierlist = {};
+var Tierlist = [];
 
 const prompt = require("prompt-sync")({ sigint: true });
 
 function Append (WonPoints,LostPoints,Ratio,First,Second) { //Adds all Data to Player objects
     Ratio = WonPoints - LostPoints
-    Tierlist[First]['Punkteverhältnis'] += Ratio
-    Tierlist[Second]['Punkteverhältnis'] += Ratio
 
-    Tierlist[First]['Gewonnene Punkte:'] += WonPoints
-    Tierlist[Second]['Gewonnene Punkte:'] += WonPoints
+    var ObjFirst = arr.find(o => o.name === First);
+    var ObjSecond = arr.find(o => o.name === Second)
 
-    Tierlist[First]['Verlorene Punkte:'] += LostPoints
-    Tierlist[Second]['Verlorene Punkte:'] += LostPoints
-
-    Tierlist[First]['Punkte:'] += 3
-    Tierlist[Second]['Punkte:'] += 3
+    ObjFirst.Punkteverhaeltnis += Ratio;
+    ObjFirst.GewonnenePunkte += WonPoints;
+    ObjFirst.VerlorenePunkte += LostPoints;
+    ObjFirst.Punkte += 3;
+    
+    ObjSecond.Punkteverhaeltnis += Ratio;
+    ObjSecond.GewonnenePunkte += WonPoints;
+    ObjSecond.VerlorenePunkte += LostPoints;
+    ObjSecond.Punkte += 3;
 
 }
 function HandlePoints(FullPoints,First,Second,GameResult) {
@@ -112,6 +114,7 @@ function MenageGameResults() {//7
     }
 // Step 1: Retrieve the keys of the object
 const sortedKeys = Object.keys(Tierlist).sort((a, b) => {
+    console.log(Tierlist)
     // Step 2: Sort based on the 'name' sub-key
     if (Tierlist[a].name < Tierlist[b].name) return -1;
     if (Tierlist[a].name > Tierlist[b].name) return 1;
@@ -140,6 +143,7 @@ function MakeFullRounds() { //5
         }
     }
     console.log(TournamentPairs,'TournamentPairs')
+    console.log(Tierlist, 'Tierlists');
 }
 function Retry(rounds) {
     if(UsedSingle.length == MaxRoundLength) {
@@ -208,16 +212,13 @@ function MakePairs(rounds) {
 }
 function HandleRounds() { //2
     for (var i = 0; i < GroupA.length; i++) {
-        Tierlist[GroupA[i]] = {}
-        Tierlist[GroupB[i]] = {}
-        Tierlist[GroupA[i]]['Punkte:'] = 0 ;
-        Tierlist[GroupB[i]]['Punkte:'] = 0 ;
-        Tierlist[GroupA[i]]['Punkteverhältnis'] = 0
-        Tierlist[GroupB[i]]['Punkteverhältnis'] = 0
-        Tierlist[GroupA[i]]['Gewonnene Punkte:'] = 0
-        Tierlist[GroupB[i]]['Gewonnene Punkte:'] = 0
-        Tierlist[GroupA[i]]['Verlorene Punkte:'] = 0
-        Tierlist[GroupB[i]]['Verlorene Punkte:'] = 0
+        Tierlist.push( {
+            "Name": GroupA[i],
+            "Punkte": 0,
+            "Punkteverhaeltnis": 0,
+            "GewonnenePunkte": 0,
+            "VerlorenePunkte": 0,
+        } )
     }
     for (let rounds = 1; rounds < 2; rounds++) {
         UsedSingle = [];//4
