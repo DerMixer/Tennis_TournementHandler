@@ -38,12 +38,12 @@ var Tierlist = [];
 
 const prompt = require("prompt-sync")({ sigint: true });
 
-function Append (WonPoints,LostPoints,Ratio,First,Second) { //Adds all Data to Player objects
-    Ratio = WonPoints - LostPoints
+function Append (WonPoints,LostPoints,Ratio,First,Second) { //updates all Data in Player objects
 
-    var ObjFirst = arr.find(o => o.name === First);
-    var ObjSecond = arr.find(o => o.name === Second)
+    var ObjFirst = Tierlist.find(o => o.Name == First);
+    var ObjSecond = Tierlist.find(o => o.Name == Second);
 
+    
     ObjFirst.Punkteverhaeltnis += Ratio;
     ObjFirst.GewonnenePunkte += WonPoints;
     ObjFirst.VerlorenePunkte += LostPoints;
@@ -68,6 +68,7 @@ function HandlePoints(FullPoints,First,Second,GameResult) {
         SinglePoints.forEach( (item) => {
             WonPoints = parseInt(item[0])
             LostPoints = parseInt(item[1])
+            Ratio = WonPoints - LostPoints;
             Append(WonPoints,LostPoints,Ratio,First,Second)
         }
     )
@@ -75,21 +76,29 @@ function HandlePoints(FullPoints,First,Second,GameResult) {
         SinglePoints.forEach( (item) => {
             WonPoints = parseInt(item[1])
             LostPoints = parseInt(item[0])
+            Ratio = WonPoints - LostPoints;
             Append(WonPoints,LostPoints,Ratio,First,Second)
         })
     }
 }
 
-function ManegeTierlist(rounds,FullPoints,GameResult) {
+function ManegeTierlist(rounds,FullPoints,GameResult) { // filters results by winner and loser team
     if ( FullPairsCopy[`Runde:${rounds}`][0] == 'kein übriges Team') {
         return
     } else {
         var WinnerTeam = FullPairsCopy[`Runde:${rounds}`][0].split(' + ')
-        var First = WinnerTeam[0];
-        WinnerTeam.shift();
-        var Second = WinnerTeam[0];
-        HandlePoints(FullPoints,First,Second,rounds,GameResult)
-        WinnerTeam.shift();
+        var LoserTeam =  FullPairsCopy[`Runde:${rounds}`][1].split(' + ')
+        console.log(`Loser team: ${LoserTeam}`)
+        var Teams = [];
+        WinnerTeam&&LoserTeam.forEach(item => {
+            Teams.push(item)
+        })
+        var WFirst = WinnerTeam[0];
+        var WSecond = WinnerTeam[1];
+        var LFirst = LoserTeam[0];
+        var LSecond = LoserTeam[1];
+
+        HandlePoints(FullPoints,WFirst,WSecond,rounds,GameResult) 
         FullPairsCopy[`Runde:${rounds}`].shift()
         TournamentPairs[`Runde:${rounds}`].shift(TournamentPairs[`Runde:${rounds}`][0]);
     }
@@ -112,22 +121,8 @@ function MenageGameResults() {//7
             }
         }
     }
-// Step 1: Retrieve the keys of the object
-const sortedKeys = Object.keys(Tierlist).sort((a, b) => {
-    console.log(Tierlist)
-    // Step 2: Sort based on the 'name' sub-key
-    if (Tierlist[a].name < Tierlist[b].name) return -1;
-    if (Tierlist[a].name > Tierlist[b].name) return 1;
-    return 0;
-  });
-  
-  // Step 3: Rebuild the sorted object
-  const sortedObj = {};
-  sortedKeys.forEach(key => {
-    sortedObj[key] = Tierlist[key];
-  });
-  
-  console.log(sortedObj,'sortedTierlist');
+  var sorted = Tierlist.sort(({Punkte:a}, {Punkte:b}) => b-a)
+  console.log(sorted,'sortedTierlist');
 }
 function MakeFullRounds() { //5
     for (let rounds = 1; rounds < 9; rounds++) {
@@ -143,7 +138,6 @@ function MakeFullRounds() { //5
         }
     }
     console.log(TournamentPairs,'TournamentPairs')
-    console.log(Tierlist, 'Tierlists');
 }
 function Retry(rounds) {
     if(UsedSingle.length == MaxRoundLength) {
@@ -211,15 +205,25 @@ function MakePairs(rounds) {
     }
 }
 function HandleRounds() { //2
-    for (var i = 0; i < GroupA.length; i++) {
+    GroupA.forEach((item) => {
         Tierlist.push( {
-            "Name": GroupA[i],
+            "Name": item,
             "Punkte": 0,
             "Punkteverhaeltnis": 0,
             "GewonnenePunkte": 0,
             "VerlorenePunkte": 0,
         } )
-    }
+    })
+    GroupB.forEach( (item) => {
+        Tierlist.push( {
+            "Name": item,
+            "Punkte": 0,
+            "Punkteverhaeltnis": 0,
+            "GewonnenePunkte": 0,
+            "VerlorenePunkte": 0,
+        } )
+    })
+    console.log(Tierlist,'Tierlist' ,Tierlist.length)
     for (let rounds = 1; rounds < 2; rounds++) {
         UsedSingle = [];//4
         MakePairs(rounds)
