@@ -38,24 +38,20 @@ var Tierlist = [];
 
 const prompt = require("prompt-sync")({ sigint: true });
 
-function Append (WonPoints,LostPoints,Ratio,First,Second) { //updates all Data in Player objects
-
-    var ObjFirst = Tierlist.find(o => o.Name == First);
-    var ObjSecond = Tierlist.find(o => o.Name == Second);
-
-    
-    ObjFirst.Punkteverhaeltnis += Ratio;
-    ObjFirst.GewonnenePunkte += WonPoints;
-    ObjFirst.VerlorenePunkte += LostPoints;
-    ObjFirst.Punkte += 3;
-    
-    ObjSecond.Punkteverhaeltnis += Ratio;
-    ObjSecond.GewonnenePunkte += WonPoints;
-    ObjSecond.VerlorenePunkte += LostPoints;
-    ObjSecond.Punkte += 3;
-
-}
-function HandlePoints(FullPoints,First,Second,GameResult) {
+function Append (WonPoints,LostPoints,Ratio,Teams) { //updates all Data in Player objects
+    Teams.forEach( item => {
+        item.forEach( Player => {
+            var Obj = Tierlist.find(o => o.Name == Player);
+            Obj.PunkteDifferenz += Ratio;
+            Obj.GewonnenePunkte += WonPoints;
+            Obj.VerlorenePunkte += LostPoints;
+            if(Teams.indexOf(item) === 0) {
+                Obj.Punkte += 3;
+            };
+        });
+    });
+};
+function HandlePoints(FullPoints,Teams,rounds,GameResult) {
     var SetResults = FullPoints.split(' ')
     var SinglePoints = []
     SetResults.forEach( (item) => {
@@ -69,7 +65,7 @@ function HandlePoints(FullPoints,First,Second,GameResult) {
             WonPoints = parseInt(item[0])
             LostPoints = parseInt(item[1])
             Ratio = WonPoints - LostPoints;
-            Append(WonPoints,LostPoints,Ratio,First,Second)
+            Append(WonPoints,LostPoints,Ratio,Teams);
         }
     )
     } else {
@@ -77,7 +73,7 @@ function HandlePoints(FullPoints,First,Second,GameResult) {
             WonPoints = parseInt(item[1])
             LostPoints = parseInt(item[0])
             Ratio = WonPoints - LostPoints;
-            Append(WonPoints,LostPoints,Ratio,First,Second)
+            Append(WonPoints,LostPoints,Ratio,Teams)
         })
     }
 }
@@ -87,18 +83,21 @@ function ManegeTierlist(rounds,FullPoints,GameResult) { // filters results by wi
         return
     } else {
         var WinnerTeam = FullPairsCopy[`Runde:${rounds}`][0].split(' + ')
+        console.log(`Winner: ${WinnerTeam}`)
         var LoserTeam =  FullPairsCopy[`Runde:${rounds}`][1].split(' + ')
         console.log(`Loser team: ${LoserTeam}`)
-        var Teams = [];
-        WinnerTeam&&LoserTeam.forEach(item => {
-            Teams.push(item)
-        })
-        var WFirst = WinnerTeam[0];
-        var WSecond = WinnerTeam[1];
-        var LFirst = LoserTeam[0];
-        var LSecond = LoserTeam[1];
-
-        HandlePoints(FullPoints,WFirst,WSecond,rounds,GameResult) 
+        var FirstCounter = 0
+        var SecondCounter = 1
+        if(GameResult === 2) {
+            FirstCounter += 1
+            SecondCounter -= 1
+        }
+        var WFirst = WinnerTeam[FirstCounter];
+        var WSecond = WinnerTeam[SecondCounter]; 
+        var LFirst = LoserTeam[FirstCounter];
+        var LSecond = LoserTeam[SecondCounter];
+        var Teams = [[WFirst,WSecond],[LFirst,LSecond]];
+        HandlePoints(FullPoints,Teams,rounds,GameResult) 
         FullPairsCopy[`Runde:${rounds}`].shift()
         TournamentPairs[`Runde:${rounds}`].shift(TournamentPairs[`Runde:${rounds}`][0]);
     }
@@ -112,16 +111,12 @@ function MenageGameResults() {//7
             var GameResult = prompt();
             console.log('Gib das Ergebnis des Spiels an:')
             var FullPoints = prompt();
-            if(GameResult == 1) {
-                ManegeTierlist(rounds,FullPoints,GameResult)
-            } 
-            if (GameResult == 2) {
-                FullPairsCopy[`Runde:${rounds}`].shift()
-                ManegeTierlist(rounds,FullPoints,GameResult)
-            }
+            ManegeTierlist(rounds,FullPoints,GameResult)
         }
     }
-  var sorted = Tierlist.sort(({Punkte:a}, {Punkte:b}) => b-a)
+  var sorted = Tierlist.sort(function (a, b) {
+    return a.Punkte - b.Punkte || a.PunkteDifferenz - b.PunkteDifferenz;
+});
   console.log(sorted,'sortedTierlist');
 }
 function MakeFullRounds() { //5
@@ -190,10 +185,12 @@ function MakePairs(rounds) {
             FullPairs[`Runde:${rounds}`].push(`${First} + ${Second}`);
             FullPairsCopy[`Runde:${rounds}`].push(`${First} + ${Second}`);
             UsedPairs.push(`${First}${Second}`, `${Second}${First}`);
+
         } else if (First && !Second) {
             FullPairs[`Runde:${rounds}`].push(`${First} + Kein Spieler mehr übrig`);
             FullPairsCopy[`Runde:${rounds}`].push(`${First} + Kein Spieler mehr übrig`);
             UsedPairs.push(`${First}Kein Spieler mehr übrig`);
+
         } else if (Second && !First) {
             FullPairs[`Runde:${rounds}`].push(`${Second} + Kein Spieler mehr übrig`);
             FullPairsCopy[`Runde:${rounds}`].push(`${Second} + Kein Spieler mehr übrig`);
@@ -209,7 +206,7 @@ function HandleRounds() { //2
         Tierlist.push( {
             "Name": item,
             "Punkte": 0,
-            "Punkteverhaeltnis": 0,
+            "PunkteDifferenz": 0,
             "GewonnenePunkte": 0,
             "VerlorenePunkte": 0,
         } )
@@ -218,7 +215,7 @@ function HandleRounds() { //2
         Tierlist.push( {
             "Name": item,
             "Punkte": 0,
-            "Punkteverhaeltnis": 0,
+            "PunkteDifferenz": 0,
             "GewonnenePunkte": 0,
             "VerlorenePunkte": 0,
         } )
