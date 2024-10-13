@@ -80,25 +80,29 @@ function HandlePoints(FullPoints,Teams,rounds,GameResult) {
 
 function ManegeTierlist(rounds,FullPoints,GameResult) { // filters results by winner and loser team
     if ( FullPairsCopy[`Runde:${rounds}`][0] == 'kein übriges Team') {
-        return
+        return;
     } else {
-        var WinnerTeam = FullPairsCopy[`Runde:${rounds}`][0].split(' + ')
-        console.log(`Winner: ${WinnerTeam}`)
-        var LoserTeam =  FullPairsCopy[`Runde:${rounds}`][1].split(' + ')
-        console.log(`Loser team: ${LoserTeam}`)
-        var FirstCounter = 0
-        var SecondCounter = 1
-        if(GameResult === 2) {
-            FirstCounter += 1
-            SecondCounter -= 1
+        var FirstCounter = 0;
+        var SecondCounter = 1;
+        
+        if(GameResult == 2) {
+            FirstCounter += 1;
+            SecondCounter -= 1;
         }
-        var WFirst = WinnerTeam[FirstCounter];
-        var WSecond = WinnerTeam[SecondCounter]; 
-        var LFirst = LoserTeam[FirstCounter];
+        console.log(FullPairsCopy[`Runde:${rounds}`])
+        var WinnerTeam = FullPairsCopy[`Runde:${rounds}`][0].split(' + ');
+        var LoserTeam = FullPairsCopy[`Runde:${rounds}`][1].split(' + ');
+
+        console.log(`Winner: ${WinnerTeam}`);
+        console.log(`Loser team: ${LoserTeam}`);
+
+        var WFirst  = WinnerTeam[FirstCounter];
+        var WSecond = WinnerTeam[SecondCounter];
+        var LFirst  = LoserTeam[FirstCounter];
         var LSecond = LoserTeam[SecondCounter];
-        var Teams = [[WFirst,WSecond],[LFirst,LSecond]];
-        HandlePoints(FullPoints,Teams,rounds,GameResult) 
-        FullPairsCopy[`Runde:${rounds}`].shift()
+        var Teams   = [[WFirst,WSecond],[LFirst,LSecond]];
+        HandlePoints(FullPoints,Teams,rounds,GameResult);
+        FullPairsCopy[`Runde:${rounds}`].shift();
         TournamentPairs[`Runde:${rounds}`].shift(TournamentPairs[`Runde:${rounds}`][0]);
     }
 } 
@@ -115,7 +119,7 @@ function MenageGameResults() {//7
         }
     }
   var sorted = Tierlist.sort(function (a, b) {
-    return a.Punkte - b.Punkte || a.PunkteDifferenz - b.PunkteDifferenz;
+    return b.Punkte - a.Punkte || b.PunkteDifferenz - a.PunkteDifferenz;
 });
   console.log(sorted,'sortedTierlist');
 }
