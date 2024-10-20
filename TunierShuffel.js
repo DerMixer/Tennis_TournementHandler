@@ -1,8 +1,8 @@
 var InputGroup = 'Gruppe A'
 var UsedPairs = [];
 var UsedSingle = [];
-var GroupA = ["Zargon", "Blix", "Klimbo", "Xylo", "Mordo", "Trillian", "Zeebo", "Grizzle", "Wumbo", "Frodo","Blinky", "Snork", "Trogdor", "Zippy", "Thrax", "Grognak", "Nebo", "Vort", "Zarnak", "Orko"]; 
-var GroupB = ["Glimmer", "Sprocket", "Rando", "Flint", "Zod", "Crinkle", "Whisk", "Jabber", "Nimbus", "Fizzle","Twitch", "Prax", "Rex", "Glob", "Ziggy", "Twix", "Kronk", "Sly", "Zyra", "Grimbo"]; 
+var GroupA = []; 
+var GroupB = []; 
 var MaxRoundLength = Math.floor((GroupA.length + GroupB.length));
 var FullPairs = {
     'Runde:1': [],
@@ -42,6 +42,7 @@ function Append (WonPoints,LostPoints,Teams) { //updates all Data in Player obje
     Teams.forEach( item => {
         item.forEach( Player => {
             var Obj = Tierlist.find(o => o.Name == Player);
+            if (Obj === undefined) {return}
             if(Teams.indexOf(item) === 0) {
                 Obj.Punkte += 3;
                 Obj.PunkteDifferenz = (WonPoints - LostPoints);
@@ -230,7 +231,8 @@ function HandleRounds() { //2
     MenageGameResults()
 }
 function GetInput() { //1
-    var Input = prompt(`Gibt einen Teilnehmer für ${InputGroup} ein (Wenn du fertig sind geben sie "fertig" ein): `);
+    var Input = prompt(`Gibt einen Teilnehmer für ${InputGroup} ein (Wenn fertig geben sie "fertig" ein / Für Teilnehmer der Gruppe B "weiter" eigeben): `);
+    console.log(Input,typeof(Input),'Input')
     if (Input == 'weiter') {
         InputGroup = 'Gruppe B'
         GetInput()
@@ -239,13 +241,12 @@ function GetInput() { //1
         HandleRounds();
         return
     } else {
-        if (InputGroup == 'GruppeA') {
+        console.log('called')
+        if (InputGroup == 'Gruppe A') {
             GroupA.push(Input)
-            Tierlist[Input]
         }
-        if (InputGroup == 'GruppeB') {
+        if (InputGroup == 'Gruppe B') {
             GroupB.push(Input)
-            Tierlist[Input]
         }
         GetInput()
     }
