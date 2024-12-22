@@ -38,14 +38,14 @@ var Tierlist = [];
 
 const prompt = require("prompt-sync")({ sigint: true });
 
-function Append (WonPoints,LostPoints,Teams) { //updates all Data in Player objects
+function Append (WonPoints,LostPoints,Teams,GameResult) { //updates all Data in Player objects
     Teams.forEach( item => {
         item.forEach( Player => {
             var Obj = Tierlist.find(o => o.Name == Player);
             if (Obj === undefined) {return}
             if(Teams.indexOf(item) === 0) {
                 Obj.Punkte += 3;
-                Obj.PunkteDifferenz = (WonPoints - LostPoints);
+                Obj.PunkteDifferenz += (WonPoints - LostPoints);
                 Obj.GewonnenePunkte += WonPoints;
                 Obj.VerlorenePunkte += LostPoints;
             } else {
@@ -64,18 +64,18 @@ function HandlePoints(FullPoints,Teams,GameResult) {
     })
     var WonPoints
     var LostPoints
-    if (GameResult == 1) {
+    if (GameResult === 1) {
         SinglePoints.forEach( (item) => {
             WonPoints = parseInt(item[0])
             LostPoints = parseInt(item[1])
-            Append(WonPoints,LostPoints,Teams);
+            Append(WonPoints,LostPoints,Teams,GameResult);
         }
     )
     } else {
         SinglePoints.forEach( (item) => {
             WonPoints = parseInt(item[1])
             LostPoints = parseInt(item[0])
-            Append(WonPoints,LostPoints,Teams)
+            Append(WonPoints,LostPoints,Teams,GameResult)
         })
     }
 }
@@ -87,7 +87,7 @@ function ManegeTierlist(rounds,FullPoints,GameResult) { // filters results by wi
         var FirstCounter = 0;
         var SecondCounter = 1;
         
-        if(GameResult == 2) {
+        if(GameResult === 2) {
             FirstCounter += 1;
             SecondCounter -= 1;
         }
@@ -100,7 +100,7 @@ function ManegeTierlist(rounds,FullPoints,GameResult) { // filters results by wi
         var LFirst  = LoserTeam[FirstCounter];
         var LSecond = LoserTeam[SecondCounter];
         var Teams   = [[WFirst,WSecond],[LFirst,LSecond]];
-        HandlePoints(FullPoints,Teams,rounds,GameResult);
+        HandlePoints(FullPoints,Teams,GameResult);
         TournamentPairs[`Runde:${rounds}`].shift();
     }
 } 
@@ -110,7 +110,7 @@ function MenageGameResults() {//7
         console.log('Runde ',rounds,':')
         while (TournamentPairs[`Runde:${rounds}`].length) {
             console.log(`${TournamentPairs[`Runde:${rounds}`][0]}:`)
-            var GameResult = prompt();
+            var GameResult = parseInt( prompt() );
             console.log('Gib das Ergebnis des Spiels an:')
             var FullPoints = prompt();
             ManegeTierlist(rounds,FullPoints,GameResult)
@@ -119,7 +119,7 @@ function MenageGameResults() {//7
     var sorted = Tierlist.sort(function (a, b) {
     return b.Punkte - a.Punkte || b.PunkteDifferenz - a.PunkteDifferenz || b.Name - a.Name;
 });
-    console.log(sorted,'sortedTierlist');
+    console.log('Ergebnis aller Runden:', sorted);
 }
 function MakeFullRounds() { //5
     for (let rounds = 1; rounds < 9; rounds++) {
@@ -134,7 +134,7 @@ function MakeFullRounds() { //5
             TournamentPairs[`Runde:${rounds}`].push(`${First} gegen ${Second}`)
         }
     }
-    console.log(TournamentPairs,'TournamentPairs')
+    //console.log(TournamentPairs,'TournamentPairs')
 }
 function Retry(rounds) {
     if(UsedSingle.length == MaxRoundLength) {
@@ -222,7 +222,6 @@ function HandleRounds() { //2
             "VerlorenePunkte": 0,
         } )
     })
-    console.log(Tierlist,'Tierlist' ,Tierlist.length)
     for (let rounds = 1; rounds < 2; rounds++) {
         UsedSingle = [];//4
         MakePairs(rounds)
@@ -231,8 +230,8 @@ function HandleRounds() { //2
     MenageGameResults()
 }
 function GetInput() { //1
-    var Input = prompt(`Gibt einen Teilnehmer für ${InputGroup} ein (Wenn fertig geben sie "fertig" ein / Für Teilnehmer der Gruppe B "weiter" eigeben): `);
-    console.log(Input,typeof(Input),'Input')
+    console.log(`Teilnehmer für ${InputGroup} (Wenn fertig "fertig" eingeben / Für Teilnehmer der Gruppe B "weiter" eigeben): `)
+    var Input = prompt();
     if (Input == 'weiter') {
         InputGroup = 'Gruppe B'
         GetInput()
@@ -241,7 +240,6 @@ function GetInput() { //1
         HandleRounds();
         return
     } else {
-        console.log('called')
         if (InputGroup == 'Gruppe A') {
             GroupA.push(Input)
         }

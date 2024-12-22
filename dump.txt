@@ -1,4 +1,2 @@
-var GroupA = ["Zargon", "Blix", "Klimbo", "Xylo", "Mordo", "Trillian", "Zeebo", "Grizzle", "Wumbo", "Frodo",
-    "Blinky", "Snork", "Trogdor", "Zippy", "Thrax", "Grognak", "Nebo", "Vort", "Zarnak", "Orko"]; 
-var GroupB = ["Glimmer", "Sprocket", "Rando", "Flint", "Zod", "Crinkle", "Whisk", "Jabber", "Nimbus", "Fizzle",
-    "Twitch", "Prax", "Rex", "Glob", "Ziggy", "Twix", "Kronk", "Sly", "Zyra", "Grimbo"]; 
+var GroupA = ["Zargon", "Blix", "Klimbo", "Xylo", "Mordo", "Trillian", "Zeebo", "Grizzle", "Wumbo", "Frodo", "Blinky", "Snork", "Trogdor", "Zippy", "Thrax", "Grognak", "Nebo", "Vort", "Zarnak", "Orko"]; 
+var GroupB = ["Glimmer", "Sprocket", "Rando", "Flint", "Zod", "Crinkle", "Whisk", "Jabber", "Nimbus", "Fizzle", "Twitch", "Prax", "Rex", "Glob", "Ziggy", "Twix", "Kronk", "Sly", "Zyra", "Grimbo"]; 
