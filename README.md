@@ -40,8 +40,14 @@ If you said that the first team won use this format: 'poinsofwinner:pointsoflose
 If the second team won just switch both values like this: 'pointsofloser:pointsofwinner'
 If the result has more than one set simply add a whitespace / space after the last value and then repeat the formats from above like this: 
 'pointsofwinner:pointsofloser pointsofwinner:pointsofloser'
-the whitespace is ***NESSEARY***
+the whitespace between each set result is ***NESSEARY***
 
 5.) 
 After all these inputs you get a result tierlist whith a few stats these are points, won points, lost points and a difference between won & lost points. The list is sorted via 
+the points each player achived. Each player will earn 3 points for a win and 0 for a loose. If players have the same amout of points the programm will rank them based on the points AND the difference between won & lost points / ratio.
 
+***Future of the programm***
+I will update this repo and upgrade from the console enivrement to an React Webapp in the future because a console enviremnt works but it sucks. it would make it more readable and accesable. Maybe i will include more scenarios like 1 vs. 1s a similar. Just more functionality.
+
+***Contact***
+If you either have questions, want to help working with the project or just contact me you can to that via this email: mickihde9@gmail.com
