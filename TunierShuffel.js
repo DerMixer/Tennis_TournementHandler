@@ -1,8 +1,8 @@
 var InputGroup = 'Gruppe A'
 var UsedPairs = [];
 var UsedSingle = [];
-var GroupA = []; 
-var GroupB = []; 
+var GroupA = ["Heiko Thomsen","thomas bretschneider","olli bss","matthias duddek","mats lange","jan pappenheimer","markus mnch","gunnar brix","carsten gambal","frank petermann","nini raab","matthias busch" ]; 
+var GroupB = ["mats luca banasch","alexandr beck","larissa","keno","linus","finn","leonie","amira preuss","wolfgang fellner","ramona preuss","britta zahl","britta neuhaus"]; 
 var MaxRoundLength = Math.floor((GroupA.length + GroupB.length));
 var FullPairs = {
     'Runde:1': [],
@@ -41,7 +41,8 @@ const prompt = require("prompt-sync")({ sigint: true });
 function Append (WonPoints,LostPoints,Teams,GameResult) { //updates all Data in Player objects
     Teams.forEach( item => {
         item.forEach( Player => {
-            var Obj = Tierlist.find(o => o.Name == Player);
+            var
+             Obj = Tierlist.find(o => o.Name == Player);
             if (Obj === undefined) {return}
             if(Teams.indexOf(item) === 0) {
                 Obj.Punkte += 3;
@@ -134,7 +135,7 @@ function MakeFullRounds() { //5
             TournamentPairs[`Runde:${rounds}`].push(`${First} gegen ${Second}`)
         }
     }
-    //console.log(TournamentPairs,'TournamentPairs')
+    console.log(TournamentPairs)
 }
 function Retry(rounds) {
     if(UsedSingle.length == MaxRoundLength) {
@@ -157,6 +158,8 @@ function Retry(rounds) {
 }
 function MakePairs(rounds) {
     UsedSingle = [];
+    GroupA.sort( (a,b) => 0.5 - Math.random() )
+    GroupB.sort( (a,b) => 0.5 - Math.random() )
     for (var AFinder = 0; AFinder < GroupA.length; AFinder++) {
         var First = GroupA[AFinder];
         for (var BFinder = 0; BFinder < GroupB.length; BFinder++) {
@@ -183,20 +186,28 @@ function MakePairs(rounds) {
         const First = remainingGroupA.length > 0 ? remainingGroupA.shift() : null;
         const Second = remainingGroupB.length > 0 ? remainingGroupB.shift() : null;
 
-        if (First && Second) {
-            FullPairs[`Runde:${rounds}`].push(`${First} + ${Second}`);
-            FullPairsCopy[`Runde:${rounds}`].push(`${First} + ${Second}`);
-            UsedPairs.push(`${First}${Second}`, `${Second}${First}`);
-
-        } else if (First && !Second) {
-            FullPairs[`Runde:${rounds}`].push(`${First} + Kein Spieler mehr übrig`);
-            FullPairsCopy[`Runde:${rounds}`].push(`${First} + Kein Spieler mehr übrig`);
-            UsedPairs.push(`${First}Kein Spieler mehr übrig`);
-
-        } else if (Second && !First) {
-            FullPairs[`Runde:${rounds}`].push(`${Second} + Kein Spieler mehr übrig`);
-            FullPairsCopy[`Runde:${rounds}`].push(`${Second} + Kein Spieler mehr übrig`);
-            UsedPairs.push(`Kein Spieler mehr übrig${Second}`);
+        if (
+            UsedPairs.includes(`${First}${Second}`) || 
+            UsedPairs.includes(`${Second}${First}`) || 
+            UsedSingle.includes(First) || 
+            UsedSingle.includes(Second)
+        ) {
+            if (First && Second) {
+                FullPairs[`Runde:${rounds}`].push(`${First} + ${Second}`);
+                FullPairsCopy[`Runde:${rounds}`].push(`${First} + ${Second}`);
+                UsedPairs.push(`${First}${Second}`, `${Second}${First}`);
+            }
+            else if (First && !Second) {
+                FullPairs[`Runde:${rounds}`].push(`${First} + Kein Spieler mehr übrig`);
+                FullPairsCopy[`Runde:${rounds}`].push(`${First} + Kein Spieler mehr übrig`);
+                UsedPairs.push(`${First}Kein Spieler mehr übrig`);
+    
+            } else if (Second && !First) {
+                FullPairs[`Runde:${rounds}`].push(`${Second} + Kein Spieler mehr übrig`);
+                FullPairsCopy[`Runde:${rounds}`].push(`${Second} + Kein Spieler mehr übrig`);
+                UsedPairs.push(`Kein Spieler mehr übrig${Second}`);
+            }    
+            }
         }
     }
     if (FullPairs[`Runde:${rounds}`].length < 10) {
@@ -222,7 +233,7 @@ function HandleRounds() { //2
             "VerlorenePunkte": 0,
         } )
     })
-    for (let rounds = 1; rounds < 2; rounds++) {
+    for (let rounds = 1; rounds < 9; rounds++) {
         UsedSingle = [];//4
         MakePairs(rounds)
     }
