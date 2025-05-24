@@ -1,8 +1,9 @@
 var InputGroup = 'Gruppe A'
-var UsedPairs = [];
-var UsedSingle = [];
-var GroupA = ["Heiko Thomsen","thomas bretschneider","olli bss","matthias duddek","mats lange","jan pappenheimer","markus mnch","gunnar brix","carsten gambal","frank petermann","nini raab","matthias busch" ]; 
-var GroupB = ["mats luca banasch","alexandr beck","larissa","keno","linus","finn","leonie","amira preuss","wolfgang fellner","ramona preuss","britta zahl","britta neuhaus"]; 
+var UsedPairs = []
+var UsedSingle = []
+var PlayerRelations = {};
+var GroupA = []; 
+var GroupB = []; 
 var MaxRoundLength = Math.floor((GroupA.length + GroupB.length));
 var FullPairs = {
     'Runde:1': [],
@@ -157,61 +158,67 @@ function Retry(rounds) {
     }
 }
 function MakePairs(rounds) {
-    UsedSingle = [];
-    GroupA.sort( (a,b) => 0.5 - Math.random() )
-    GroupB.sort( (a,b) => 0.5 - Math.random() )
-    for (var AFinder = 0; AFinder < GroupA.length; AFinder++) {
-        var First = GroupA[AFinder];
-        for (var BFinder = 0; BFinder < GroupB.length; BFinder++) {
-            var Second = GroupB[BFinder];
-            if (
-                UsedPairs.includes(`${First}${Second}`) || 
-                UsedPairs.includes(`${Second}${First}`) || 
-                UsedSingle.includes(First) || 
-                UsedSingle.includes(Second)
-            ) {
-                continue; 
+    let maxTries = 1000;
+    let tries = 0;
+    let success = false;
+
+    // Initialize PlayerRelations if not already done
+    GroupA.concat(GroupB).forEach(name => {
+        if (!PlayerRelations[name]) PlayerRelations[name] = new Set();
+    });
+
+    while (!success ) {
+        tries++;
+        UsedSingle = [];
+        let pairsThisRound = [];
+        let shuffledA = [...GroupA].sort(() => 0.5 - Math.random());
+        let shuffledB = [...GroupB].sort(() => 0.5 - Math.random());
+
+        for (let i = 0; i < shuffledA.length; i++) {
+            let First = shuffledA[i];
+            if (UsedSingle.includes(First)) continue;
+            for (let j = 0; j < shuffledB.length; j++) {
+                let Second = shuffledB[j];
+                if (UsedSingle.includes(Second)) continue;
+                let matchupKey = [First, Second].sort().join('|');
+
+                // Check if this pair has already played in any previous round
+                if (UsedPairs.includes(matchupKey)) continue;
+
+                // Check if either player has played with or against the other
+                if (
+                    PlayerRelations[First].has(Second) ||
+                    PlayerRelations[Second].has(First)
+                ) continue;
+
+                // Accept this pair
+                pairsThisRound.push([First, Second]);
+                UsedSingle.push(First, Second);
+                break;
             }
-            UsedSingle.push(First);
-            UsedSingle.push(Second);
-            UsedPairs.push(`${First}${Second}`, `${Second}${First}`);
-            FullPairs[`Runde:${rounds}`].push(`${First} + ${Second}`);
-            FullPairsCopy[`Runde:${rounds}`].push(`${First} + ${Second}`);
+            if (pairsThisRound.length === 12) break; // 6 games per round
         }
-    }
-    let remainingGroupA = GroupA.filter(participant => !UsedSingle.includes(participant));
-    let remainingGroupB = GroupB.filter(participant => !UsedSingle.includes(participant));
 
-    while (remainingGroupA.length > 0 || remainingGroupB.length > 0) {
-        const First = remainingGroupA.length > 0 ? remainingGroupA.shift() : null;
-        const Second = remainingGroupB.length > 0 ? remainingGroupB.shift() : null;
-
-        if (
-            UsedPairs.includes(`${First}${Second}`) || 
-            UsedPairs.includes(`${Second}${First}`) || 
-            UsedSingle.includes(First) || 
-            UsedSingle.includes(Second)
-        ) {
-            if (First && Second) {
+        if (pairsThisRound.length === 12) {
+            for (let [First, Second] of pairsThisRound) {
+                let matchupKey = [First, Second].sort().join('|');
                 FullPairs[`Runde:${rounds}`].push(`${First} + ${Second}`);
                 FullPairsCopy[`Runde:${rounds}`].push(`${First} + ${Second}`);
-                UsedPairs.push(`${First}${Second}`, `${Second}${First}`);
+                UsedPairs.push(matchupKey);
+
+                // Update relations: both are now teammates and opponents
+                PlayerRelations[First].add(Second);
+                PlayerRelations[Second].add(First);
             }
-            else if (First && !Second) {
-                FullPairs[`Runde:${rounds}`].push(`${First} + Kein Spieler mehr übrig`);
-                FullPairsCopy[`Runde:${rounds}`].push(`${First} + Kein Spieler mehr übrig`);
-                UsedPairs.push(`${First}Kein Spieler mehr übrig`);
-    
-            } else if (Second && !First) {
-                FullPairs[`Runde:${rounds}`].push(`${Second} + Kein Spieler mehr übrig`);
-                FullPairsCopy[`Runde:${rounds}`].push(`${Second} + Kein Spieler mehr übrig`);
-                UsedPairs.push(`Kein Spieler mehr übrig${Second}`);
-            }    
-            }
+            success = true;
+        } else {
+            FullPairs[`Runde:${rounds}`] = [];
+            FullPairsCopy[`Runde:${rounds}`] = [];
         }
     }
-    if (FullPairs[`Runde:${rounds}`].length < 10) {
-        Retry(rounds);
+
+    if (!success) {
+        console.log(`Konnte keine 6 vollständigen Spiele für Runde ${rounds} finden.`);
     }
 }
 function HandleRounds() { //2
@@ -236,9 +243,9 @@ function HandleRounds() { //2
     for (let rounds = 1; rounds < 9; rounds++) {
         UsedSingle = [];//4
         MakePairs(rounds)
-    }
-    MakeFullRounds()//5
-    MenageGameResults()
+    }//5
+    MakeFullRounds();
+    //MenageGameResults() 
 }
 function GetInput() { //1
     console.log(`Teilnehmer für ${InputGroup} (Wenn fertig "fertig" eingeben / Für Teilnehmer der Gruppe B "weiter" eigeben): `)
